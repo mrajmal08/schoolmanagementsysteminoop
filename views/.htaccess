@@ -1,0 +1,32 @@
+DirectoryIndex index.php login.php
+ErrorDocument 404 /school/errors/error_404.php
+ErrorDocument 403 /school/errors/error_403.php
+
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+#RewriteRule ^teacher/(.*)/(.*)$ teacher.php?type=$1&id=$2 [NC,L]
+
+
+RewriteRule ^principal principal.php [NC,L]
+RewriteRule ^teacher teacher.php [NC,L]
+RewriteRule ^student student.php [NC,L]
+RewriteRule ^class classes.php [NC,L]
+RewriteRule ^subject subject.php [NC,L]
+RewriteRule ^my_class my_class.php [NC,L]
+RewriteRule ^my_subject my_subject.php [NC,L]
+RewriteRule ^requested requested.php [NC,L]
+RewriteRule ^home home.php [NC,L]
+RewriteRule ^login login.php [NC,L]
+RewriteRule ^register register.php [NC,L]
+RewriteRule ^logout logout.php [NC,L]
+RewriteRule ^home home.php [NC,L]
+RewriteRule ^index index.php [NC,L]
+</IfModule>
+
+
+#Authtype Basic
+#AuthName "Athentication with htpassword"
+#AuthUserFile C:\wamp64\www\school\htpassword\.htpasswd
+#Require valid-user

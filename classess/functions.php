@@ -1,5 +1,5 @@
 <?php
-include "includes/config.php";
+require "../views/includes/config.php";
 
 class School
 {
