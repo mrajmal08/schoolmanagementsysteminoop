@@ -2,10 +2,11 @@
 session_start();
 include  "includes/config.php";
 include  "../classess/functions.php";
+
 if (isset($_POST['submitLogin'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $result = login_user($conn, $email, $password);
+    $result = $obj->login_user($conn, $email, $password);
 }
 
 ?>

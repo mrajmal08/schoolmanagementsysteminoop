@@ -118,15 +118,15 @@ if (isset($_POST['submitForm'])) {
                                 <div class="mb-2">
                                     <select class="form-control form-control-lg" name="role" required>
                                         <option disabled selected>--Select Role--</option>
-<!--                                        --><?php
-//                                        $result = show($conn, 'role',false, '');
-//                                        foreach ($result as $row) {
-//                                            ?>
-<!--                                            <option value="--><?//= $row['id'] ?><!--">--><?//= $row['name'] ?><!--</option>-->
-<!---->
-<!--                                            --><?php
-//                                        }
-//                                        ?>
+                                        <?php
+                                        $result = $obj->show($conn, 'role',false, '');
+                                        foreach ($result as $row) {
+                                            ?>
+                                            <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+
+                                            <?php
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                                 <button type="submit" name="submitForm" class="btn login-form__btn

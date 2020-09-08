@@ -3,6 +3,7 @@ require "../views/includes/config.php";
 
 class School
 {
+
     /**
      * this function return fetched data adn required table name and where condition
      * @param $conn
@@ -98,7 +99,7 @@ class School
         if (!empty($user_id)) {
             $data['data'] = ['status' => 1];
             $where = "id = " . $user_id;
-            return update($conn, 'user', $data, $where);
+            return $this->update($conn, 'user', $data, $where);
         }
     }
 
@@ -131,14 +132,14 @@ class School
                   FROM `user_has_class` 
                   INNER JOIN user ON user_has_class.user_id = user.id 
                   INNER JOIN class ON user_has_class.class_id = class.id WHERE user_id = $user_id";
-                return get_data_for_query($conn, $query);
+                return $this->get_data_for_query($conn, $query);
                 break;
             case 'subject':
                 $query = "SELECT subject.id as id, subject.name as subjectname, subject.author as authorname 
                   FROM `user_has_subject` INNER JOIN user ON user_has_subject.user_id = user.id
                   INNER JOIN subject ON user_has_subject.subject_id = subject.id WHERE
                   user_id = $user_id";
-                return get_data_for_query($conn, $query);
+                return $this->get_data_for_query($conn, $query);
                 break;
             default:
         }
@@ -154,7 +155,7 @@ class School
         $query = "SELECT user.id, user.name as username, user.email, user.address, user.contact, user.status,
               role.name as rolename FROM user INNER JOIN role ON user.role_id = role.id WHERE
               user.status = 0";
-        return get_data_for_query($conn, $query);
+        return $this->get_data_for_query($conn, $query);
     }
 
     /**
@@ -176,17 +177,15 @@ class School
                 ];
                 //getting columns and values for insert query
                 $where = "user_id = " . $user_id . " AND class_id = " . $class_id;
-                $result = show($conn, 'user_has_class', false, $where);
-                if (isset($result['user_id']) && isset($result['class_id'])) {
-                    if ($result['user_id'] > 1 && $result['class_id'] > 1) {
-                        return "<span style='color: red'>class already asssigned</span>";
-                    }
+                $result = $this->show($conn, 'user_has_class', false, $where);
+                if (!empty($result)) {
+                    return "<span style='color: red'>class already asssigned</span>";
                 } else {
                     //getting columns and values for insert query
                     $columns = ['user_id', 'class_id'];
                     $values = [':user_id', ':class_id'];
 
-                    insert($conn, 'user_has_class', $columns, $values, $data);
+                    $this->insert($conn, 'user_has_class', $columns, $values, $data);
                 }
             } catch (PDOException $e) {
                 return "Error : " . $e->getMessage();
@@ -200,16 +199,14 @@ class School
                 ];
                 //getting columns and values for insert query
                 $where = "user_id = " . $user_id . " AND subject_id = " . $subject_id;
-                $result = show($conn, 'user_has_subject', false, $where);
-                if (isset($result['user_id']) && isset($result['subject_id'])) {
-                    if ($result['user_id'] > 1 && $result['subject_id'] > 1) {
-                        return "<span style='color: red'>subject already asssigned</span>";
-                    }
+                $result = $this->show($conn, 'user_has_subject', false, $where);
+                if (!empty($result)) {
+                    return "<span style='color: red'>class already asssigned</span>";
                 } else {
                     //getting columns and values for insert query
                     $columns = ['user_id', 'subject_id'];
                     $values = [':user_id', ':subject_id'];
-                    insert($conn, 'user_has_subject', $columns, $values, $data);
+                    $this->insert($conn, 'user_has_subject', $columns, $values, $data);
                 }
             } catch (PDOException $e) {
                 return "Error : " . $e->getMessage();
@@ -230,7 +227,7 @@ class School
             try {
                 //check user for verification
                 $where = " email = '" . $email . "' AND password = '" . $password . "' AND status = 1";
-                $row = show($conn, 'user', 1, $where);
+                $row = $this->show($conn, 'user', 1, $where);
                 if (!empty($row) && $row) {
                     $_SESSION['sess_user_id'] = $row['id'];
                     $_SESSION['sess_name'] = $row['name'];
@@ -289,7 +286,7 @@ class School
                         }
                         ?>
                         <td>
-                            <?php buttons($action, $row); ?>
+                            <?php $this->buttons($action, $row); ?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -307,7 +304,7 @@ class School
     function buttons($action, $row)
     {
         foreach ($action as $key => $button) {
-            printButton($button, $row);
+            $this->printButton($button, $row);
         }
     }
 
@@ -332,3 +329,4 @@ class School
         <?php
     }
 }
+$obj = new School();
