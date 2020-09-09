@@ -1,8 +1,12 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
-include 'validation/validation.php';
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$validation = new Validation();
+
+
 
 //global variables for form validation errors
 $output_name = '';
@@ -14,7 +18,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'edit') {
         $subject_id = $_GET['id'];
 
         $where = 'id =' . $subject_id;
-        $outcome = $obj->show($conn, 'subject', false, $where);
+        $outcome = $student->show('subject', false, $where);
     }
 }
 if (isset($_POST['edit'])) {
@@ -23,7 +27,7 @@ if (isset($_POST['edit'])) {
     $data['data'] = $_POST;
     $where = "id = " . $_POST['subject_id'];
     unset($data['data']['subject_id']);
-    $final = $obj->update($conn, 'subject', $data, $where);
+    $final = $student->update('subject', $data, $where);
     if ($final) {
         header('location: subject');
         exit;
@@ -31,7 +35,7 @@ if (isset($_POST['edit'])) {
     //subject add code here
 } elseif (isset($_POST['submitSubject'])) {
     $name = $_POST['name'];
-    if (!name_validation($name)) {
+    if (!$validation->name_validation($name)) {
         $output_name = "<span style='color: red'>Enter a valid Name</span>";
         $check_validation = 0;
     }
@@ -44,7 +48,7 @@ if (isset($_POST['edit'])) {
     $values = [':name', ':author'];
     $result = '';
     if ($check_validation == 1) {
-        $result = $obj->insert($conn, 'subject', $columns, $values, $data);
+        $result = $student->insert('subject', $columns, $values, $data);
     }
     if ($result) {
         header('location: subject.php');
@@ -56,7 +60,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
         $where = "id = ". $user_id;
-        $obj->delete($conn, 'subject', $where);
+        $student->delete('subject', $where);
         header('location: subject.php');
         exit;
     }
@@ -131,7 +135,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                             </div>
                             <?php
                             $thead = ['Class Name', 'Auhtor Name', 'Actions'];
-                            $tbody = $obj->show($conn, 'subject', false, '');
+                            $tbody = $student->show('subject', false, '');
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
@@ -147,7 +151,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                 ],
 
                             ];
-                            $obj->datatable($conn, $thead, $tbody, $action);
+                            $student->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

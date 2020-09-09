@@ -1,24 +1,28 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
-//remove Subject code:
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$subject = new Subject();
+
+
 if (isset($_GET['type']) && $_GET['type'] == 'un_assign') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['user_id'];
         $subject_id = $_GET['id'];
 
         $where = "user_id = " . $user_id . " And subject_id = " . $subject_id;
-        $obj->delete($conn, 'user_has_subject', $where);
+        $student->delete('user_has_subject', $where);
         $user_id = $_GET['user_id'];
         $where = 'id =' . $user_id;
-        $data = $obj->show($conn, 'user', 1, $where);
+        $data = $student->show('user', 1, $where);
 
     }
 } else {
     $user_id = $_GET['id'];
     $where = 'id =' . $user_id;
-    $data = $obj->show($conn, 'user', 1, $where);
+    $data = $student->show('user', 1, $where);
 }
 
 //for assigning the subject
@@ -26,7 +30,7 @@ if (isset($_POST['user_id'])) {
     $user_id = $_POST['user_id'];
     if (isset($_POST['subject_id'])) {
         $subject_id = $_POST['subject_id'];
-        $obj->assign_class_subject($conn, $user_id, '0', $subject_id);
+        $student->assign_class_subject($user_id, '0', $subject_id);
     }
 }
 
@@ -56,7 +60,8 @@ if (isset($_POST['user_id'])) {
                                                 required>
                                             <option disabled selected>--Select Subject--</option>
                                             <?php
-                                            $result = $obj->show($conn, 'subject', false, '');
+                                            $result = $student->show('subject',
+                                                false, '');
                                             foreach ($result as $row) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>"><?= $row['name'] ?>
@@ -96,7 +101,7 @@ if (isset($_POST['user_id'])) {
                             <?php
                             $thead = ['Subject Name', 'Author Name', 'Actions'];
                             $user_id = $data['id'];
-                            $tbody = $obj->user_class_subject($conn, $user_id, 'subject');
+                            $tbody = $subject->user_class_subject($user_id, 'subject');
                             $action = [
                                 'button1' => [
                                     'default' => [
@@ -108,7 +113,7 @@ if (isset($_POST['user_id'])) {
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                             ];
-                            $obj->datatable($conn, $thead, $tbody, $action);
+                            $student->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

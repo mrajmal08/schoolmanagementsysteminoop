@@ -1,7 +1,8 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
+require_once "../autoload/autoload.php";
+$subject = new Subject();
+//sessin id
 $user_id = $_SESSION['sess_user_id'];
 ?>
 
@@ -23,7 +24,8 @@ $user_id = $_SESSION['sess_user_id'];
 <div id="preloader">
     <div class="loader">
         <svg class="circular" viewBox="25 25 50 50">
-            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10"/>
+            <circle class="path" cx="50" cy="50" r="20" fill="none"
+                    stroke-width="3" stroke-miterlimit="10"/>
         </svg>
     </div>
 </div>
@@ -66,8 +68,8 @@ $user_id = $_SESSION['sess_user_id'];
                                 </div>
                                 <?php
                                 $thead = ['Subject Name', 'Author Name'];
-                                $tbody = $obj->user_class_subject($conn, $user_id, 'subject');
-                                $obj->datatable($conn, $thead, $tbody, '');
+                                $tbody = $subject->user_class_subject($user_id, 'subject');
+                                $subject->datatable($thead, $tbody, '');
                                 ?>
                             </div>
                         </div>

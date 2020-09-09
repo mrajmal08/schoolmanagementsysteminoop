@@ -1,7 +1,16 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$subject = new Subject();
+
+//require_once "../classess/School.php";
+//require_once "../classess/Student.php";
+//require_once "../classess/Subject.php";
+
+
 
 if (isset($_GET['type'])) {
     if ($_GET['type'] == 'un_assign') {
@@ -10,16 +19,16 @@ if (isset($_GET['type'])) {
             $class_id = $_GET['id'];
 
             $where = "user_id = " . $user_id . " And class_id = " . $class_id;
-            $obj->delete($conn, 'user_has_class', $where);
+            $student->delete('user_has_class', $where);
 
             $user_id = $_GET['user_id'];
             $where = 'id =' . $user_id;
-            $data = $obj->show($conn, 'user', 1, $where);
+            $data = $student->show('user', 1, $where);
         }
     } else {
         $user_id = $_GET['id'];
         $where = 'id =' . $user_id;
-        $data = $obj->show($conn, 'user', 1, $where);
+        $data = $student->show('user', 1, $where);
     }
 }
 
@@ -28,7 +37,7 @@ if (isset($_POST['submit'])) {
     if (isset($_POST['class_id'])) {
         $user_id = $_POST['user_id'];
         $class_id = $_POST['class_id'];
-        $obj->assign_class_subject($conn, $user_id, $class_id);
+        $student->assign_class_subject($user_id, $class_id);
 
     }
 }
@@ -57,7 +66,8 @@ if (isset($_POST['submit'])) {
                                                 required>
                                             <option disabled selected>--Select class--</option>
                                             <?php
-                                            $result = $obj->show($conn, 'class', false, '');
+                                            $result = $student->show('class',
+                                                false, '');
                                             foreach ($result as $row) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>"><?= $row['name'] ?>
@@ -98,7 +108,7 @@ if (isset($_POST['submit'])) {
                             <?php
                             $thead = ['Class Name', 'Class Number', 'Actions'];
                             $user_id = $data['id'];
-                            $tbody = $obj->user_class_subject($conn, $user_id, 'class');
+                            $tbody = $subject->user_class_subject($user_id, 'class');
                             $action = [
                                 'button1' => [
                                     'default' => [
@@ -110,7 +120,7 @@ if (isset($_POST['submit'])) {
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                             ];
-                            $obj->datatable($conn, $thead, $tbody, $action);
+                            $student->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

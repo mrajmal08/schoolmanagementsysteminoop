@@ -1,8 +1,11 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
-include 'validation/validation.php';
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$validation = new Validation();
+
 
 //global variables for for validation errors
 $output_name = '';
@@ -25,7 +28,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'edit') {
         $user_id = $_GET['id'];
 
         $where = 'id =' . $user_id;
-        $user = $obj->show($conn, 'user', 1, $where);
+        $user = $student->show('user', 1, $where);
     }
 }
 if (isset($_POST['edit'])) {
@@ -34,14 +37,14 @@ if (isset($_POST['edit'])) {
     $data['data'] = $_POST;
     $where = "id = " . $_POST['id'];
     unset($data['data']['id']);
-    $answer = $obj->update($conn, 'user', $data, $where);
+    $answer = $student->update('user', $data, $where);
     if ($answer) {
         header('location: principal.php');
         exit;
     }
 } elseif (isset($_POST['submitPrincipal'])) {
     $name = $_POST['name'];
-    if (!name_validation($name)) {
+    if (!$validation->name_validation($name)) {
         $output_name = "<span style='color: red'>Enter a valid Name</span>";
         $check_validation = 0;
     }
@@ -51,13 +54,13 @@ if (isset($_POST['edit'])) {
         $check_validation = 0;
     }
     $password = $_POST['password'];
-    if (!password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 ch</span>";
+    if (!$validation->password_validation($password)) {
+        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
         $check_validation = 0;
     }
     $address = $_POST['address'];
     $contact = $_POST['contact'];
-    if (!contact_validation($contact)) {
+    if (!$validation->contact_validation($contact)) {
         $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
         $check_validation = 0;
     }
@@ -77,7 +80,7 @@ if (isset($_POST['edit'])) {
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
     $final = '';
     if ($check_validation == 1) {
-        $final = $obj->insert($conn, 'user', $columns, $values, $data);
+        $final = $student->insert('user', $columns, $values, $data);
     }
     if ($final) {
         header('location: principal');
@@ -89,7 +92,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
         $where = "id = ". $user_id;
-        $obj->delete($conn, 'user', $where);
+        $student->delete('user', $where);
         header('location: principal');
         exit;
     }
@@ -205,10 +208,23 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                             </div>
                             <!-- Principal table code-->
                             <?php
-                            $thead = ['Name', 'Email', 'Password', 'Address', 'Contact', 'Gender', 'Action'];
+                            /**
+                             * table head
+                             */
+                            $thead = [
+                                'Name',
+                                'Email',
+                                'Password',
+                                'Address',
+                                'Contact',
+                                'Gender',
+                                'Action'
+                            ];
                             $where = "status = 1 AND role_id = 2";
-                            $tbody = $obj->show($conn, 'user', false, $where);
-
+                            $tbody = $student->show('user', false, $where);
+                            /**
+                             * array for buttons
+                             */
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
@@ -223,7 +239,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                     'class' => 'btn btn-warning btn-sm'
                                 ],
                             ];
-                            $obj->datatable($conn, $thead, $tbody, $action);
+                            $student->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

@@ -1,9 +1,7 @@
 <?php
-include "config.php";
 $user_id = $_SESSION['sess_user_id'];
-
 $where = 'id =' . $user_id;
-$sidebar = $obj->show($conn, 'user', false, $where);
+$sidebar = $student->show('user', false, $where);
 ?>
 <div class="nk-sidebar">
     <div class="nk-nav-scroll">

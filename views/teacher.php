@@ -1,17 +1,24 @@
 <?php
-session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
-include "validation/validation.php";
 
-//Error variables
+session_start();
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$validation = new Validation();
+
+/**
+ * Error variables
+ */
 $output_name = '';
 $output_email = '';
 $output_password = '';
 $output_contact = '';
 $check_validation = 1;
 
-//Code if admin add any of other user and status set on this
+/**
+ * Code if admin add any of other user and status set on this
+ */
 $admin_id = $_SESSION['sess_user_id'];
 $session_role = $_SESSION['role'];
 if ($session_role == 1) {
@@ -19,16 +26,20 @@ if ($session_role == 1) {
 } else {
     $status = 0;
 }
-//teacher display code
+/**
+ * teacher display code
+ */
 if (isset($_GET['type']) && $_GET['type'] == 'edit') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
         $where = 'id =' . $user_id;
-        $user = $obj->show($conn, 'user', 1, $where);
+        $user = $student->show('user', 1, $where);
 
     }
 }
-//Teacher update code here
+/**
+ * Teacher update code here
+ */
 if (isset($_POST['edit'])) {
     unset($_POST['edit']);
     unset($_POST['submitTeacher']);
@@ -36,15 +47,18 @@ if (isset($_POST['edit'])) {
     $where = "id = " . $_POST['id'];
 
     unset($data['data']['id']);
-    $answer = $obj->update($conn, 'user', $data, $where);
+    $answer = $student->update('user', $data, $where);
     if ($answer) {
         header('location: teacher.php');
         exit;
     }
-} //submit teacher code with strong validation
+}
+/**
+ * submit teacher code with strong validation
+ */
 elseif (isset($_POST['submitTeacher'])) {
     $name = $_POST['name'];
-    if (!name_validation($name)) {
+    if (!$validation->name_validation($name)) {
         $output_name = "<span style='color: red'>Enter a valid Name</span>";
         $check_validation = 0;
     }
@@ -54,13 +68,13 @@ elseif (isset($_POST['submitTeacher'])) {
         $check_validation = 0;
     }
     $password = $_POST['password'];
-    if (!password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 ch</span>";
+    if (!$validation->password_validation($password)) {
+        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
         $check_validation = 0;
     }
     $address = $_POST['address'];
     $contact = $_POST['contact'];
-    if (!contact_validation($contact)) {
+    if (!$validation->contact_validation($contact)) {
         $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
         $check_validation = 0;
     }
@@ -80,7 +94,7 @@ elseif (isset($_POST['submitTeacher'])) {
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
     $final = '';
     if ($check_validation == 1) {
-        $final = $obj->insert($conn, 'user', $columns, $values, $data);
+        $final = $student->insert('user', $columns, $values, $data);
     }
     if ($final) {
         header('location: teacher');
@@ -94,7 +108,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
         $user_id = $_GET['id'];
 
         $where = "id = ". $user_id;
-        $obj->delete($conn, 'user', $where);
+        $student->delete('user', $where);
         header('location: teacher');
         exit;
     }
@@ -207,9 +221,20 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                             </div>
                             <!--Teacher data table code -->
                             <?php
-                            $thead = ['Name', 'Email', 'Password', 'Address', 'Contact', 'Gender', 'Action'];
+                            $thead = [
+                                'Name',
+                                'Email',
+                                'Password',
+                                'Address',
+                                'Contact',
+                                'Gender',
+                                'Action'
+                            ];
                             $where = "status = 1 AND role_id = 3";
-                            $tbody = $obj->show($conn, 'user', false, $where);
+                            $tbody = $student->show('user', false, $where);
+                            /**
+                             * Array for buttons
+                             */
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
@@ -225,7 +250,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                 ],
 
                             ];
-                            $obj->datatable($conn, $thead, $tbody, $action);
+                            $student->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

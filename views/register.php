@@ -1,7 +1,9 @@
 <?php
-include  "includes/config.php";
-include  "../classess/functions.php";
-include 'validation/validation.php';
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
+
+$student = new Students();
+$validation = new Validation();
 
 $output_name = '';
 $output_email = '';
@@ -11,7 +13,7 @@ $check_validation = 1;
 
 if (isset($_POST['submitForm'])) {
     $name = $_POST['name'];
-    if (!name_validation($name)) {
+    if (!$validation->name_validation($name)) {
         $output_name = "<span style='color: red'>Enter a valid Name</span>";
         $check_validation = 0;
     }
@@ -21,13 +23,13 @@ if (isset($_POST['submitForm'])) {
         $check_validation = 0;
     }
     $password = $_POST['password'];
-    if (!password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 ch</span>";
+    if (!$validation->password_validation($password)) {
+        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
         $check_validation = 0;
     }
     $address = $_POST['address'];
     $contact = $_POST['contact'];
-    if (!contact_validation($contact)) {
+    if (!$validation->contact_validation($contact)) {
         $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
         $check_validation = 0;
     }
@@ -45,7 +47,7 @@ if (isset($_POST['submitForm'])) {
     ];
     $columns = ['name', 'email', 'password', 'address', 'contact', 'gender', 'role_id'];
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role'];
-    $final = insert($conn, 'user', $columns, $values, $data);
+    $final = $student->insert('user', $columns, $values, $data);
     if ($final) {
         header('location: login');
         exit;
@@ -66,7 +68,8 @@ if (isset($_POST['submitForm'])) {
 <div id="preloader">
     <div class="loader">
         <svg class="circular" viewBox="25 25 50 50">
-            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10"/>
+            <circle class="path" cx="50" cy="50" r="20" fill="none"
+                    stroke-width="3" stroke-miterlimit="10"/>
         </svg>
     </div>
 </div>
@@ -77,7 +80,8 @@ if (isset($_POST['submitForm'])) {
                 <div class="form-input-content">
                     <div class="card login-form mb-0">
                         <div class="card-body pt-5">
-                            <a class="text-center" href="home.php"><h4>School Management System</h4></a>
+                            <a class="text-center" href="home.php"><h4>
+                                    School Management System</h4></a>
                             <form method="post" action="" class="mt-5 mb-5 login-input">
                                 <div class="form-group">
                                     <label class="card-title">Name</label>
@@ -111,18 +115,22 @@ if (isset($_POST['submitForm'])) {
                                 <label class="card-title">Gender</label>
                                 <div class="form-group">
                                     <label class="radio-inline mr-3" data-children-count="1">
-                                        <input type="radio" class="" value="male" name="gender"> Male</label>
+                                        <input type="radio" class="" value="male" name="gender">
+                                        Male</label>
                                     <label class="radio-inline mr-3" data-children-count="1">
-                                        <input type="radio" value="female" name="gender"> Female</label>
+                                        <input type="radio" value="female" name="gender">
+                                        Female</label>
                                 </div>
                                 <div class="mb-2">
                                     <select class="form-control form-control-lg" name="role" required>
                                         <option disabled selected>--Select Role--</option>
                                         <?php
-                                        $result = $obj->show($conn, 'role',false, '');
+                                        $result = $student->show('role',
+                                            false, '');
                                         foreach ($result as $row) {
                                             ?>
-                                            <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
+                                            <option value="<?= $row['id'] ?>"><?= $row['name'] ?>
+                                            </option>
 
                                             <?php
                                         }

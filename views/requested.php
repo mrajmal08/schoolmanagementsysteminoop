@@ -1,12 +1,11 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
-
+require_once "../autoload/autoload.php";
+$admin = new Admin();
 
 if (isset($_GET['type']) && $_GET['type'] == 'approve') {
     $user_id = $_GET['id'];
-    $obj->approve_req($conn, $user_id);
+    $admin->approve_req($user_id);
     header('location: requested');
     exit;
 //User request delete code
@@ -14,7 +13,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'approve') {
     $user_id = $_GET['id'];
 
     $where = "id = ". $user_id;
-    $obj->delete($conn, 'user', $where);
+    $admin->delete('user', $where);
     header('location: requested');
     exit;
 }
@@ -72,7 +71,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'approve') {
 
 
                                 $thead = ['Name', 'Email', 'Address', 'Contact', 'Gender', 'Action'];
-                                $tbody = $obj->fetch_requested_data($conn);
+                                $tbody = $admin->fetch_requested_data();
                                 $action = [
                                     'button1' => [
                                         'value' => 'approve',
@@ -88,7 +87,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'approve') {
                                     ],
 
                                 ];
-                                $obj->datatable($conn, $thead, $tbody, $action);
+                                $admin->datatable($thead, $tbody, $action);
                                 ?>
                             </div>
                         </div>

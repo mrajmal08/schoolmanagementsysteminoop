@@ -1,12 +1,16 @@
 <?php
 session_start();
-include  "includes/config.php";
-include  "../classess/functions.php";
+require_once "../autoload/autoload.php";
+use MyStudent\Student as Students;
 
+$student = new Students();
+/**
+ * login function call
+ */
 if (isset($_POST['submitLogin'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $result = $obj->login_user($conn, $email, $password);
+    $result = $student->login_user($email, $password);
 }
 
 ?>
