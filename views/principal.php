@@ -1,9 +1,7 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-use MyStudent\Student as Students;
-
-$student = new Students();
+$school = new School('user');
 $validation = new Validation();
 
 
@@ -28,7 +26,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'edit') {
         $user_id = $_GET['id'];
 
         $where = 'id =' . $user_id;
-        $user = $student->show('user', 1, $where);
+        $user = $school->show(1, $where);
     }
 }
 if (isset($_POST['edit'])) {
@@ -37,7 +35,7 @@ if (isset($_POST['edit'])) {
     $data['data'] = $_POST;
     $where = "id = " . $_POST['id'];
     unset($data['data']['id']);
-    $answer = $student->update('user', $data, $where);
+    $answer = $school->update($data, $where);
     if ($answer) {
         header('location: principal.php');
         exit;
@@ -80,7 +78,7 @@ if (isset($_POST['edit'])) {
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
     $final = '';
     if ($check_validation == 1) {
-        $final = $student->insert('user', $columns, $values, $data);
+        $final = $school->insert($columns, $values, $data);
     }
     if ($final) {
         header('location: principal');
@@ -92,7 +90,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
         $where = "id = ". $user_id;
-        $student->delete('user', $where);
+        $school->delete($where);
         header('location: principal');
         exit;
     }
@@ -221,7 +219,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                 'Action'
                             ];
                             $where = "status = 1 AND role_id = 2";
-                            $tbody = $student->show('user', false, $where);
+                            $tbody = $school->show(false, $where);
                             /**
                              * array for buttons
                              */
@@ -239,7 +237,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                     'class' => 'btn btn-warning btn-sm'
                                 ],
                             ];
-                            $student->datatable($thead, $tbody, $action);
+                            $school->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

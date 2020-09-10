@@ -2,7 +2,7 @@
 
 require_once "../autoload/autoload.php";
 
-class Subject extends School
+class Subject extends \School
 {
     /**
      * this function used only for query execution
@@ -10,12 +10,14 @@ class Subject extends School
      * @param $query
      * @return mixed
      */
-    private function get_data_for_query($query)
+    public static function get_data_for_query($query)
     {
         if (!empty($query)) {
+            $data = Database::$conn->query($query);
+            return $data->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
         }
-        $data = $this->conn->query($query);
-        return $data->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -25,7 +27,7 @@ class Subject extends School
      * @param null $type
      * @return mixed
      */
-    public function user_class_subject($user_id, $type = null)
+    public static function user_class_subject($user_id, $type = null)
     {
         switch ($type) {
             case 'class':
@@ -33,14 +35,15 @@ class Subject extends School
                   FROM `user_has_class` 
                   INNER JOIN user ON user_has_class.user_id = user.id 
                   INNER JOIN class ON user_has_class.class_id = class.id WHERE user_id = $user_id";
-                return $this->get_data_for_query($query);
+                return self::get_data_for_query($query);
                 break;
             case 'subject':
-                $query = "SELECT subject.id as id, subject.name as subjectname, subject.author as authorname 
+                $query = "SELECT subject.id as id, subject.name as subjectname, subject.author as
+                  authorname 
                   FROM `user_has_subject` INNER JOIN user ON user_has_subject.user_id = user.id
                   INNER JOIN subject ON user_has_subject.subject_id = subject.id WHERE
                   user_id = $user_id";
-                return $this->get_data_for_query($query);
+                return self::get_data_for_query($query);
                 break;
             default:
         }

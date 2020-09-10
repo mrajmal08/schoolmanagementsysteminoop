@@ -1,6 +1,8 @@
 <?php
-require_once "../views/includes/config.php";
-class Validation{
+require_once "../autoload/autoload.php";
+
+class Validation extends School
+{
 
     public function name_validation($name)
     {

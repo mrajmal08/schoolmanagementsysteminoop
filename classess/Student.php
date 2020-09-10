@@ -1,4 +1,5 @@
 <?php
+
 namespace MyStudent;
 require_once "../autoload/autoload.php";
 

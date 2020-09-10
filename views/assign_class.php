@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once "../autoload/autoload.php";
 use MyStudent\Student as Students;

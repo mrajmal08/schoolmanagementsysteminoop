@@ -1,27 +1,34 @@
 <?php
-require_once "../views/includes/config.php";
+
 abstract class Database
 {
-    public $conn;
-
-    function __construct()
+    public static $conn;
+//    public static $table;
+    public $table;
+    public function __construct($table = null)
     {
-
+        if(!empty($table)) {
+//            self::$table = $table;
+            $this->table = $table;
+//            var_dump(self::$table);
+        }
         try {
-            $this->conn = new PDO("mysql:host=" . servername . ";dbname=" . db . "", username, password);
+            $conn = new PDO("mysql:host=localhost;dbname=schoolsystem",
+                "root", "");
             // set the PDO error mode to exception
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$conn = $conn;
             //echo "Connected successfully";
         } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
+            require "Connection failed: " . $e->getMessage();
         }
     }
 
-    abstract protected function show($table, $single_user = false, $where = false);
+    abstract public function show($single_user = false, $where = false);
 
-    abstract protected function insert($table, $columns, $values, $data);
+    abstract protected function insert($columns, $values, $data);
 
-    abstract protected function delete($table, $where);
+    abstract protected function delete($where);
 
-    abstract protected function update($table, $data, $where);
+    abstract protected function update($data, $where);
 }

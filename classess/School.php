@@ -4,7 +4,6 @@ require_once "../autoload/autoload.php";
 
 class School extends Database
 {
-
     /**
      * this function return fetched data adn required table name and where condition
      * @param $conn
@@ -12,17 +11,19 @@ class School extends Database
      * @param bool $where
      * @return mixed
      */
-    public function show($table, $single_user = false, $where = false)
+    public function show($single_user = false, $where = false)
     {
+        $table = $this->table;
+
         $query = "SELECT * FROM {$table} ";
         if ($where) {
             $query .= " WHERE " . $where;
         }
         if ($single_user) {
-            $data = $this->conn->query($query);
+            $data = self::$conn->query($query);
             return $data->fetch(PDO::FETCH_ASSOC);
         } else {
-            $data = $this->conn->query($query);
+            $data = self::$conn->query($query);
             return $data->fetchAll(PDO::FETCH_ASSOC);
         }
     }
@@ -36,12 +37,13 @@ class School extends Database
      * @param $data
      * @return string
      */
-    public function insert($table, $columns, $values, $data)
+    public function insert($columns, $values, $data)
     {
+        $table = $this->table;
         try {
             $query = "INSERT INTO {$table} (" . implode(',', $columns) . ") VALUES
          (" . implode(',', $values) . ")";
-            $exe = $this->conn->prepare($query);
+            $exe = Database::$conn->prepare($query);
             return $exe->execute($data);
             //exception
         } catch (PDOException $e) {
@@ -56,13 +58,14 @@ class School extends Database
      * @param $values
      * @return mixed
      */
-    public function delete($table, $where)
+    public function delete($where)
     {
+        $table = $this->table;
         $query = "DELETE FROM {$table} ";
         if (!empty($where)) {
             $query .= " WHERE " . $where;
         }
-        $exe = $this->conn->prepare($query);
+        $exe = Database::$conn->prepare($query);
         return $exe->execute();
     }
 
@@ -73,8 +76,9 @@ class School extends Database
      * @param $data
      * @return mixed
      */
-    public function update($table, $data, $where)
+    public function update($data, $where)
     {
+        $table = $this->table;
         try {
             $original = $data['data'];
             $cols = [];
@@ -82,7 +86,7 @@ class School extends Database
                 $cols[] = "$key = '$value'";
             }
             $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE $where";
-            $exe = $this->conn->prepare($query);
+            $exe = Database::$conn->prepare($query);
             return $exe->execute();
         } catch (PDOException $e) {
             return "Error : " . $e->getMessage();
@@ -176,7 +180,7 @@ class School extends Database
      * @param $action
      * @param $row
      */
-    private function buttons($action, $row)
+    public function buttons($action, $row)
     {
         if (!empty($action)) {
             foreach ($action as $key => $button) {
@@ -190,7 +194,7 @@ class School extends Database
      * @param $button
      * @param $row
      */
-    private function printButton($button, $row)
+    public function printButton($button, $row)
     {
         $url = $button['url'] . '?type=' . $button['value'];
         foreach ($button['require'] as $key => $value) {

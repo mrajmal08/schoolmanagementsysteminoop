@@ -2,8 +2,10 @@
 
 spl_autoload_register(function($className) {
     $parts = explode('\\', $className);
-    require "../classess/".end($parts) . ".php";
-
+    $file = "../classess/".end($parts) . ".php";
+    if(file_exists($file)){
+        require $file;
+    }
 });
 
 //spl_autoload_register(function($className) {

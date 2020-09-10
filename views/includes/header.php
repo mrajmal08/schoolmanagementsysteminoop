@@ -1,8 +1,13 @@
 <?php
+$sc = new School('user');
+//use MyStudent\Student as Students;
+//$sc = new Students('user');
+$head =  $sc->table;
 
 $user_id = $_SESSION['sess_user_id'];
 $where = 'id =' . $user_id;
-$header = $student->show('user', false, $where);
+
+$header = $sc->show(false, $where);
 ?>
 <div class="header">
     <div class="header-content clearfix">

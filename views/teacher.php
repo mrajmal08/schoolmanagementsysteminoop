@@ -2,9 +2,7 @@
 
 session_start();
 require_once "../autoload/autoload.php";
-use MyStudent\Student as Students;
-
-$student = new Students();
+$school = new School('user');
 $validation = new Validation();
 
 /**
@@ -33,7 +31,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'edit') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
         $where = 'id =' . $user_id;
-        $user = $student->show('user', 1, $where);
+        $user = $school->show(1, $where);
 
     }
 }
@@ -47,7 +45,7 @@ if (isset($_POST['edit'])) {
     $where = "id = " . $_POST['id'];
 
     unset($data['data']['id']);
-    $answer = $student->update('user', $data, $where);
+    $answer = $school->update($data, $where);
     if ($answer) {
         header('location: teacher.php');
         exit;
@@ -94,7 +92,7 @@ elseif (isset($_POST['submitTeacher'])) {
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
     $final = '';
     if ($check_validation == 1) {
-        $final = $student->insert('user', $columns, $values, $data);
+        $final = $school->insert($columns, $values, $data);
     }
     if ($final) {
         header('location: teacher');
@@ -108,7 +106,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
         $user_id = $_GET['id'];
 
         $where = "id = ". $user_id;
-        $student->delete('user', $where);
+        $student->delete($where);
         header('location: teacher');
         exit;
     }
@@ -231,7 +229,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                 'Action'
                             ];
                             $where = "status = 1 AND role_id = 3";
-                            $tbody = $student->show('user', false, $where);
+                            $tbody = $school->show(false, $where);
                             /**
                              * Array for buttons
                              */
@@ -250,7 +248,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                 ],
 
                             ];
-                            $student->datatable($thead, $tbody, $action);
+                            $school->datatable($thead, $tbody, $action);
                             ?>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 <?php
-require_once "School.php";
+require_once "../autoload/autoload.php";
 
 class Admin extends School
 {
@@ -26,13 +26,13 @@ class Admin extends School
      * @param $conn
      * @return mixed
      */
-    public function fetch_requested_data()
+    public static function fetch_requested_data()
     {
         $query = "SELECT user.id, user.name as username, user.email, user.address, 
                  user.contact, user.status,
                  role.name as rolename FROM user INNER JOIN role ON user.role_id = role.id WHERE
                  user.status = 0";
-        return $this->query_execution($query);
+        return self::query_execution($query);
     }
 
     /**
@@ -41,12 +41,15 @@ class Admin extends School
      * @param $query
      * @return mixed
      */
-    private function query_execution($query)
+    private static function query_execution($query)
     {
         if (!empty($query)) {
+            $data = Database::$conn->query($query);
+            return $data->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
         }
-        $data = $this->conn->query($query);
-        return $data->fetchAll(PDO::FETCH_ASSOC);
+
     }
 
 }
