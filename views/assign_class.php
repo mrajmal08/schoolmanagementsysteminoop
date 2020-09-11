@@ -2,9 +2,10 @@
 
 session_start();
 require_once "../autoload/autoload.php";
+$school = new School('user');
 use MyStudent\Student as Students;
 
-$student = new Students();
+$student = new Students('user_has_class');
 $subject = new Subject();
 
 //require_once "../classess/School.php";
@@ -20,16 +21,16 @@ if (isset($_GET['type'])) {
             $class_id = $_GET['id'];
 
             $where = "user_id = " . $user_id . " And class_id = " . $class_id;
-            $student->delete('user_has_class', $where);
+            $student->delete($where);
 
             $user_id = $_GET['user_id'];
             $where = 'id =' . $user_id;
-            $data = $student->show('user', 1, $where);
+            $data = $school->show( 1, $where);
         }
     } else {
         $user_id = $_GET['id'];
         $where = 'id =' . $user_id;
-        $data = $student->show('user', 1, $where);
+        $data = $school->show(1, $where);
     }
 }
 
@@ -67,8 +68,8 @@ if (isset($_POST['submit'])) {
                                                 required>
                                             <option disabled selected>--Select class--</option>
                                             <?php
-                                            $result = $student->show('class',
-                                                false, '');
+                                            $class = new School('class');
+                                            $result = $class->show(false, '');
                                             foreach ($result as $row) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>"><?= $row['name'] ?>

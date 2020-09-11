@@ -1,9 +1,10 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
+$school = new School('user');
 use MyStudent\Student as Students;
 
-$student = new Students();
+$student = new Students('user_has_subject');
 $subject = new Subject();
 
 
@@ -13,16 +14,16 @@ if (isset($_GET['type']) && $_GET['type'] == 'un_assign') {
         $subject_id = $_GET['id'];
 
         $where = "user_id = " . $user_id . " And subject_id = " . $subject_id;
-        $student->delete('user_has_subject', $where);
+        $student->delete($where);
         $user_id = $_GET['user_id'];
         $where = 'id =' . $user_id;
-        $data = $student->show('user', 1, $where);
+        $data = $school->show(1, $where);
 
     }
 } else {
     $user_id = $_GET['id'];
     $where = 'id =' . $user_id;
-    $data = $student->show('user', 1, $where);
+    $data = $school->show(1, $where);
 }
 
 //for assigning the subject
@@ -60,8 +61,8 @@ if (isset($_POST['user_id'])) {
                                                 required>
                                             <option disabled selected>--Select Subject--</option>
                                             <?php
-                                            $result = $student->show('subject',
-                                                false, '');
+                                            $sub = new School('subject');
+                                            $result = $sub->show(false, '');
                                             foreach ($result as $row) {
                                                 ?>
                                                 <option value="<?= $row['id'] ?>"><?= $row['name'] ?>

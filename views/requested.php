@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$admin = new Admin();
+$admin = new Admin('user');
 
 if (isset($_GET['type']) && $_GET['type'] == 'approve') {
     $user_id = $_GET['id'];
@@ -12,8 +12,8 @@ if (isset($_GET['type']) && $_GET['type'] == 'approve') {
 } elseif (isset($_GET['type']) && $_GET['type'] == 'un_approve') {
     $user_id = $_GET['id'];
 
-    $where = "id = ". $user_id;
-    $admin->delete('user', $where);
+    $where = "id = " . $user_id;
+    $admin->delete($where);
     header('location: requested');
     exit;
 }

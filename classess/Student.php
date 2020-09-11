@@ -24,7 +24,7 @@ class Student extends \School
                 ];
                 //getting columns and values for insert query
                 $where = "user_id = " . $user_id . " AND class_id = " . $class_id;
-                $result = $this->show('user_has_class', false, $where);
+                $result = $this->show(false, $where);
                 if (!empty($result)) {
                     return "<span style='color: red'>class already asssigned</span>";
                 } else {
@@ -32,7 +32,7 @@ class Student extends \School
                     $columns = ['user_id', 'class_id'];
                     $values = [':user_id', ':class_id'];
 
-                    $this->insert('user_has_class', $columns, $values, $data);
+                    $this->insert($columns, $values, $data);
                 }
             } catch (PDOException $e) {
                 return "Error : " . $e->getMessage();
@@ -46,14 +46,14 @@ class Student extends \School
                 ];
                 //getting columns and values for insert query
                 $where = "user_id = " . $user_id . " AND subject_id = " . $subject_id;
-                $result = $this->show('user_has_subject', false, $where);
+                $result = $this->show(false, $where);
                 if (!empty($result)) {
                     return "<span style='color: red'>class already asssigned</span>";
                 } else {
                     //getting columns and values for insert query
                     $columns = ['user_id', 'subject_id'];
                     $values = [':user_id', ':subject_id'];
-                    $this->insert('user_has_subject', $columns, $values, $data);
+                    $this->insert($columns, $values, $data);
                 }
             } catch (PDOException $e) {
                 return "Error : " . $e->getMessage();

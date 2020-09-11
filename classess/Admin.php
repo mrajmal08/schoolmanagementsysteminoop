@@ -12,6 +12,7 @@ class Admin extends School
      */
     public function approve_req($user_id)
     {
+        $table = $this->table;
         if (!empty($user_id)) {
             $data['data'] = ['status' => 1];
             $where = "id = " . $user_id;

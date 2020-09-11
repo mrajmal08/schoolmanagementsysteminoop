@@ -1,16 +1,14 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-use MyStudent\Student as Students;
-
-$student = new Students();
+$school = new School('user');
 /**
  * login function call
  */
 if (isset($_POST['submitLogin'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $result = $student->login_user($email, $password);
+    $result = $school->login_user($email, $password);
 }
 
 ?>

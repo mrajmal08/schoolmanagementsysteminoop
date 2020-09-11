@@ -102,11 +102,13 @@ class School extends Database
      */
     public function login_user($email, $password)
     {
+        $table = $this->table;
+
         if ($email != "" && $password != "") {
             try {
                 //check user for verification
                 $where = " email = '" . $email . "' AND password = '" . $password . "' AND status = 1";
-                $row = $this->show('user', 1, $where);
+                $row = $this->show(1, $where);
                 if (!empty($row) && $row) {
                     $_SESSION['sess_user_id'] = $row['id'];
                     $_SESSION['sess_name'] = $row['name'];

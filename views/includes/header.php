@@ -1,7 +1,5 @@
 <?php
 $sc = new School('user');
-//use MyStudent\Student as Students;
-//$sc = new Students('user');
 $head =  $sc->table;
 
 $user_id = $_SESSION['sess_user_id'];

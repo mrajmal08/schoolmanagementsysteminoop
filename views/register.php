@@ -1,8 +1,6 @@
 <?php
 require_once "../autoload/autoload.php";
-use MyStudent\Student as Students;
-
-$student = new Students();
+$school = new School('user');
 $validation = new Validation();
 
 $output_name = '';
@@ -47,7 +45,7 @@ if (isset($_POST['submitForm'])) {
     ];
     $columns = ['name', 'email', 'password', 'address', 'contact', 'gender', 'role_id'];
     $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role'];
-    $final = $student->insert('user', $columns, $values, $data);
+    $final = $school->insert($columns, $values, $data);
     if ($final) {
         header('location: login');
         exit;
@@ -125,8 +123,8 @@ if (isset($_POST['submitForm'])) {
                                     <select class="form-control form-control-lg" name="role" required>
                                         <option disabled selected>--Select Role--</option>
                                         <?php
-                                        $result = $student->show('role',
-                                            false, '');
+                                        $role = new School('role');
+                                        $result = $role->show(false, '');
                                         foreach ($result as $row) {
                                             ?>
                                             <option value="<?= $row['id'] ?>"><?= $row['name'] ?>

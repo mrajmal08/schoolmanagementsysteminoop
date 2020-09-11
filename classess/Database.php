@@ -3,14 +3,12 @@
 abstract class Database
 {
     public static $conn;
-//    public static $table;
     public $table;
+
     public function __construct($table = null)
     {
-        if(!empty($table)) {
-//            self::$table = $table;
+        if (!empty($table)) {
             $this->table = $table;
-//            var_dump(self::$table);
         }
         try {
             $conn = new PDO("mysql:host=localhost;dbname=schoolsystem",
@@ -20,7 +18,7 @@ abstract class Database
             self::$conn = $conn;
             //echo "Connected successfully";
         } catch (PDOException $e) {
-            require "Connection failed: " . $e->getMessage();
+            return "Connection failed: " . $e->getMessage();
         }
     }
 
