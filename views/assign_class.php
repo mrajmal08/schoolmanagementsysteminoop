@@ -2,17 +2,15 @@
 
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('user');
+$school = new Database('user');
+
 use MyStudent\Student as Students;
 
 $student = new Students('user_has_class');
-$subject = new Subject();
 
-//require_once "../classess/School.php";
-//require_once "../classess/Student.php";
-//require_once "../classess/Subject.php";
+use MySubject\Subject as Subjects;
 
-
+$subject = new Subjects();
 
 if (isset($_GET['type'])) {
     if ($_GET['type'] == 'un_assign') {
@@ -40,7 +38,6 @@ if (isset($_POST['submit'])) {
         $user_id = $_POST['user_id'];
         $class_id = $_POST['class_id'];
         $student->assign_class_subject($user_id, $class_id);
-
     }
 }
 ?>
@@ -64,11 +61,11 @@ if (isset($_POST['submit'])) {
                                     <input type="hidden" name="user_id"
                                            value="<?php echo $data['id']; ?>"/>
                                     <div class="mb-2 form-group">
-                                        <select class="form-control form-control-lg" name="class_id"
+                                        <select aria-label="ss" class="form-control form-control-lg" name="class_id"
                                                 required>
                                             <option disabled selected>--Select class--</option>
                                             <?php
-                                            $class = new School('class');
+                                            $class = new Database('class');
                                             $result = $class->show(false, '');
                                             foreach ($result as $row) {
                                                 ?>
@@ -108,9 +105,12 @@ if (isset($_POST['submit'])) {
                             </div>
                             <!--table for assigned classes-->
                             <?php
+                            //table header array
                             $thead = ['Class Name', 'Class Number', 'Actions'];
                             $user_id = $data['id'];
+                            //table body array
                             $tbody = $subject->user_class_subject($user_id, 'class');
+                            //buttons array
                             $action = [
                                 'button1' => [
                                     'default' => [
@@ -131,7 +131,6 @@ if (isset($_POST['submit'])) {
         </div>
         <!-- #/ container -->
     </div>
-
 </div>
 
 <!--**********************************

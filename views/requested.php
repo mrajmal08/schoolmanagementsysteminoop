@@ -1,7 +1,10 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$admin = new Admin('user');
+
+use MyAdmin\Admin as AdminObj;
+
+$admin = new AdminObj('user');
 
 if (isset($_GET['type']) && $_GET['type'] == 'approve') {
     $user_id = $_GET['id'];

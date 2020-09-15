@@ -1,18 +1,12 @@
 <?php
-
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('user');
-$validation = new Validation();
 
-/**
- * Error variables
- */
-$output_name = '';
-$output_email = '';
-$output_password = '';
-$output_contact = '';
-$check_validation = 1;
+$school = new Database('user');
+
+use MyValidation\Validation as validations;
+
+$validation = new validations();
 
 /**
  * Code if admin add any of other user and status set on this
@@ -24,6 +18,8 @@ if ($session_role == 1) {
 } else {
     $status = 0;
 }
+
+$check_validation = 1;
 /**
  * teacher display code
  */
@@ -50,62 +46,57 @@ if (isset($_POST['edit'])) {
         header('location: teacher.php');
         exit;
     }
-}
-/**
+} /**
  * submit teacher code with strong validation
  */
 elseif (isset($_POST['submitTeacher'])) {
-    $name = $_POST['name'];
-    if (!$validation->name_validation($name)) {
-        $output_name = "<span style='color: red'>Enter a valid Name</span>";
-        $check_validation = 0;
-    }
-    $email = $_POST['email'];
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $output_email = "<span style='color: red'>Enter a valid email address</span>";
-        $check_validation = 0;
-    }
-    $password = $_POST['password'];
-    if (!$validation->password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
-        $check_validation = 0;
-    }
-    $address = $_POST['address'];
-    $contact = $_POST['contact'];
-    if (!$validation->contact_validation($contact)) {
-        $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
-        $check_validation = 0;
-    }
-    $gender = $_POST['gender'];
-    $role = 3;
-    $data = [
-        'name' => $name,
-        'email' => $email,
-        'password' => $password,
-        'address' => $address,
-        'contact' => $contact,
-        'gender' => $gender,
-        'role' => $role,
-        'status' => $status
+    $rules = [
+        'name' => 'required|max:6',
+        'email' => 'required|email',
+        'password' => 'required|max:20|min:6'
     ];
-    $columns = ['name', 'email', 'password', 'address', 'contact', 'gender', 'role_id', 'status'];
-    $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
-    $final = '';
-    if ($check_validation == 1) {
-        $final = $school->insert($columns, $values, $data);
-    }
-    if ($final) {
-        header('location: teacher');
-        exit;
-    }
 
+    $validation->validate($rules);
+    if ($validation->errors) {
+        $error = $validation->errors;
+    } else {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $address = $_POST['address'];
+        $contact = $_POST['contact'];
+        $gender = $_POST['gender'];
+        $role = 3;
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'address' => $address,
+            'contact' => $contact,
+            'gender' => $gender,
+            'role' => $role,
+            'status' => $status
+        ];
+        $columns = ['name', 'email', 'password', 'address',
+            'contact', 'gender', 'role_id', 'status'];
+        $values = [':name', ':email', ':password', ':address',
+            ':contact', ':gender', ':role', ':status'];
+        $final = '';
+        if ($check_validation == 1) {
+            $final = $school->insert($columns, $values, $data);
+        }
+        if ($final) {
+            header('location: teacher');
+            exit;
+        }
+    }
 }
 //delete teacher code here
 if (isset($_GET['type']) && $_GET['type'] == 'delete') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
 
-        $where = "id = ". $user_id;
+        $where = "id = " . $user_id;
         $student->delete($where);
         header('location: teacher');
         exit;
@@ -136,7 +127,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                placeholder="Enter Name"
                                                value="<?php echo isset($user['name']) ?
                                                    $user['name'] : ""; ?>" required>
-                                        <?php if (isset($output_name)) echo $output_name; ?>
+                                        <?php
+                                        if (!empty($error['name'])) {
+                                            $validation->print_errors($error['name']);
+                                        }
+                                        ?>
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Email</label>
@@ -144,7 +139,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($user['email']) ?
                                                    $user['email'] : ""; ?>"
                                                placeholder="test@test.com" required>
-                                        <?php if (isset($output_email)) echo $output_email; ?>
+                                        <?php
+                                        if (!empty($error['email'])) {
+                                            $validation->print_errors($error['email']);
+                                        }
+                                        ?>
                                     </div>
 
                                     <div class="form-group">
@@ -161,8 +160,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                         <input type="number" class="form-control" name="contact"
                                                value="<?php echo isset($user['contact']) ?
                                                    $user['contact'] : ""; ?>"
-                                               placeholder="000-0000-0000">
-                                        <?php if (isset($output_contact)) echo $output_contact; ?>
+                                               placeholder="123..." required>
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Password</label>
@@ -170,7 +168,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($user['password']) ?
                                                    $user['password'] : ""; ?>"
                                                placeholder="******" required>
-                                        <?php if (isset($output_password)) echo $output_password; ?>
+                                        <?php
+                                        if (!empty($error['password'])) {
+                                            $validation->print_errors($error['password']);
+                                        }
+                                        ?>
                                     </div>
                                     <label class="card-title">Gender</label>
                                     <div class="form-group">
@@ -178,13 +180,15 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                             <input type="radio" class="" value="male"
                                                 <?php if (isset($user['gender']) &&
                                                     $user['gender'] == 'male')
-                                                    echo 'checked="checked"'; ?> required name="gender">
+                                                    echo 'checked="checked"'; ?>
+                                                   required name="gender">
                                             Male</label>
                                         <label class="radio-inline mr-3" data-children-count="1">
                                             <input type="radio" value="female"
                                                 <?php if (isset($user['gender']) &&
                                                     $user['gender'] == 'female')
-                                                    echo 'checked="checked"'; ?> required name="gender">
+                                                    echo 'checked="checked"'; ?>
+                                                   required name="gender">
                                             Female</label>
                                     </div>
                                     <?php

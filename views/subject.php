@@ -1,8 +1,10 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('subject');
-$validation = new Validation();
+$school = new Database('subject');
+use MyValidation\Validation as validations;
+
+$validation = new validations();
 
 //global variables for form validation errors
 $output_name = '';
@@ -30,25 +32,31 @@ if (isset($_POST['edit'])) {
     }
     //subject add code here
 } elseif (isset($_POST['submitSubject'])) {
-    $name = $_POST['name'];
-    if (!$validation->name_validation($name)) {
-        $output_name = "<span style='color: red'>Enter a valid Name</span>";
-        $check_validation = 0;
-    }
-    $author = $_POST['author'];
-    $data = [
-        'name' => $name,
-        'author' => $author,
+    $rules = [
+        'name' => 'required|max:12',
     ];
-    $columns = ['name', 'author'];
-    $values = [':name', ':author'];
-    $result = '';
-    if ($check_validation == 1) {
-        $result = $school->insert($columns, $values, $data);
-    }
-    if ($result) {
-        header('location: subject.php');
-        exit;
+
+    $validation->validate($rules);
+    if ($validation->errors) {
+        $error = $validation->errors;
+    } else {
+        $name = $_POST['name'];
+
+        $author = $_POST['author'];
+        $data = [
+            'name' => $name,
+            'author' => $author,
+        ];
+        $columns = ['name', 'author'];
+        $values = [':name', ':author'];
+        $result = '';
+        if ($check_validation == 1) {
+            $result = $school->insert($columns, $values, $data);
+        }
+        if ($result) {
+            header('location: subject.php');
+            exit;
+        }
     }
 }
 //subject delete code
@@ -89,7 +97,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($outcome[0]['name']) ?
                                                    $outcome[0]['name'] : ""; ?>"
                                                required>
-                                        <?php if (isset($output_name)) echo $output_name; ?>
+                                        <?php
+                                        if(!empty($error['name'])) {
+                                            $validation->print_errors($error['name']);
+                                        }
+                                        ?>
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Author Name</label>

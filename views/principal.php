@@ -1,8 +1,11 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('user');
-$validation = new Validation();
+$school = new Database('user');
+
+use MyValidation\Validation as validations;
+
+$validation = new validations();
 
 
 //global variables for for validation errors
@@ -41,55 +44,52 @@ if (isset($_POST['edit'])) {
         exit;
     }
 } elseif (isset($_POST['submitPrincipal'])) {
-    $name = $_POST['name'];
-    if (!$validation->name_validation($name)) {
-        $output_name = "<span style='color: red'>Enter a valid Name</span>";
-        $check_validation = 0;
-    }
-    $email = $_POST['email'];
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $output_email = "<span style='color: red'>Enter a valid email address</span>";
-        $check_validation = 0;
-    }
-    $password = $_POST['password'];
-    if (!$validation->password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
-        $check_validation = 0;
-    }
-    $address = $_POST['address'];
-    $contact = $_POST['contact'];
-    if (!$validation->contact_validation($contact)) {
-        $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
-        $check_validation = 0;
-    }
-    $gender = $_POST['gender'];
-    $role = 2;
-    $data = [
-        'name' => $name,
-        'email' => $email,
-        'password' => $password,
-        'address' => $address,
-        'contact' => $contact,
-        'gender' => $gender,
-        'role' => $role,
-        'status' => $status
+    $rules = [
+        'name' => 'required|max:6',
+        'email' => 'email|required',
+        'password' => 'required|max:20|min:6'
     ];
-    $columns = ['name', 'email', 'password', 'address', 'contact', 'gender', 'role_id', 'status'];
-    $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role', ':status'];
-    $final = '';
-    if ($check_validation == 1) {
-        $final = $school->insert($columns, $values, $data);
-    }
-    if ($final) {
-        header('location: principal');
-        exit;
+
+    $validation->validate($rules);
+    if ($validation->errors) {
+        $error = $validation->errors;
+    } else {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $address = $_POST['address'];
+        $contact = $_POST['contact'];
+        $gender = $_POST['gender'];
+        $role = 2;
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'address' => $address,
+            'contact' => $contact,
+            'gender' => $gender,
+            'role' => $role,
+            'status' => $status
+        ];
+        $columns = ['name', 'email', 'password', 'address', 'contact',
+            'gender', 'role_id', 'status'];
+        $values = [':name', ':email', ':password', ':address',
+            ':contact', ':gender', ':role', ':status'];
+        $final = '';
+        if ($check_validation == 1) {
+            $final = $school->insert($columns, $values, $data);
+        }
+        if ($final) {
+            header('location: principal');
+            exit;
+        }
     }
 }
 //Principal delete code
 if (isset($_GET['type']) && $_GET['type'] == 'delete') {
     if (isset($_GET['id'])) {
         $user_id = $_GET['id'];
-        $where = "id = ". $user_id;
+        $where = "id = " . $user_id;
         $school->delete($where);
         header('location: principal');
         exit;
@@ -121,7 +121,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($user['name']) ?
                                                    $user['name'] : ""; ?>"
                                                required>
-                                        <?php if (isset($output_name)) echo $output_name; ?>
+                                        <?php
+                                        if (!empty($error['name'])) {
+                                            $validation->print_errors($error['name']);
+                                        }
+                                        ?>
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Email</label>
@@ -129,7 +133,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($user['email']) ?
                                                    $user['email'] : ""; ?>"
                                                placeholder="test@test.com" required>
-                                        <?php if (isset($output_email)) echo $output_email; ?>
+                                        <?php
+                                        if (!empty($error['email'])) {
+                                            $validation->print_errors($error['email']);
+                                        }
+                                        ?>
                                     </div>
 
                                     <div class="form-group">
@@ -146,9 +154,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                         <input type="number" class="form-control" name="contact"
                                                value="<?php echo isset($user['contact']) ?
                                                    $user['contact'] : ""; ?>"
-                                               placeholder="000-0000-0000">
-                                        <?php if (isset($output_contact))
-                                            echo $output_contact; ?>
+                                               placeholder="123...">
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Password</label>
@@ -156,7 +162,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($user['password']) ?
                                                    $user['password'] : ""; ?>"
                                                placeholder="******" required>
-                                        <?php if (isset($output_password)) echo $output_password; ?>
+                                        <?php
+                                        if (!empty($error['password'])) {
+                                            $validation->print_errors($error['password']);
+                                        }
+                                        ?>
                                     </div>
                                     <label class="card-title">Gender</label>
                                     <div class="form-group">

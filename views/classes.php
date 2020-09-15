@@ -1,10 +1,11 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('class');
-$obj = $school->table;
+$school = new Database('class');
 
-$validation = new Validation();
+use MyValidation\Validation as validations;
+
+$validation = new validations();
 
 //for validation error global variables
 $output_name = '';
@@ -32,25 +33,30 @@ if (isset($_POST['edit'])) {
     }
     //Class submit code here
 } elseif (isset($_POST['submitClass'])) {
-    $name = $_POST['name'];
-    if (!$validation->name_validation($name)) {
-        $output_name = "<span style='color: red'>Enter a valid Name</span>";
-        $check_validation = 0;
-    }
-    $number = $_POST['number'];
-    $data = [
-        'name' => $name,
-        'number' => $number,
+    $rules = [
+        'name' => 'required|max:12',
     ];
-    $columns = ['name', 'number'];
-    $values = [':name', ':number'];
-    $result = '';
-    if ($check_validation == 1) {
-        $result = $student->insert($columns, $values, $data);
-    }
-    if ($result) {
-        header('location: classes.php');
-        exit;
+    $validation->validate($rules);
+
+    if ($validation->errors) {
+        $error = $validation->errors;
+    } else {
+        $name = $_POST['name'];
+        $number = $_POST['number'];
+        $data = [
+            'name' => $name,
+            'number' => $number,
+        ];
+        $columns = ['name', 'number'];
+        $values = [':name', ':number'];
+        $result = '';
+        if ($check_validation == 1) {
+            $result = $student->insert($columns, $values, $data);
+        }
+        if ($result) {
+            header('location: classes.php');
+            exit;
+        }
     }
 }
 //delete class code here
@@ -92,7 +98,11 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                                                value="<?php echo isset($outcome['name']) ?
                                                    $outcome['name'] : ""; ?>"
                                                required>
-                                        <?php if (isset($output_name)) echo $output_name; ?>
+                                        <?php
+                                        if(!empty($error['name'])) {
+                                            $validation->print_errors($error['name']);
+                                        }
+                                        ?>
                                     </div>
                                     <div class="form-group">
                                         <label class="card-title">Class No</label>
@@ -134,7 +144,6 @@ if (isset($_GET['type']) && $_GET['type'] == 'delete') {
                             </div>
                             <?php
                             $thead = ['Class Name', 'Class Number', 'Actions'];
-                            var_dump($school->table);
                             $tbody = $school->show(false, '');
 
                             $action = [

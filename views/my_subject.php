@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$subject = new Subject();
+use MySubject\Subject as Subjects;
+
+$subject = new Subjects();
 //sessin id
 $user_id = $_SESSION['sess_user_id'];
 ?>

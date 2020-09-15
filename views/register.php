@@ -1,7 +1,11 @@
 <?php
 require_once "../autoload/autoload.php";
-$school = new School('user');
-$validation = new Validation();
+
+$school = new Database('user');
+
+use MyValidation\Validation as validations;
+
+$validation = new validations();
 
 $output_name = '';
 $output_email = '';
@@ -10,45 +14,42 @@ $output_contact = '';
 $check_validation = 1;
 
 if (isset($_POST['submitForm'])) {
-    $name = $_POST['name'];
-    if (!$validation->name_validation($name)) {
-        $output_name = "<span style='color: red'>Enter a valid Name</span>";
-        $check_validation = 0;
-    }
-    $email = $_POST['email'];
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $output_email = "<span style='color: red'>Enter a valid email address</span>";
-        $check_validation = 0;
-    }
-    $password = $_POST['password'];
-    if (!$validation->password_validation($password)) {
-        $output_password = "<span style='color: red'>Atleast 8 CH</span>";
-        $check_validation = 0;
-    }
-    $address = $_POST['address'];
-    $contact = $_POST['contact'];
-    if (!$validation->contact_validation($contact)) {
-        $output_contact = "<span style='color: red'>Enter a valid contact 000-0000-0000</span>";
-        $check_validation = 0;
-    }
-    $gender = $_POST['gender'];
-    $role = $_POST['role'];
-    $data = [
-        'name' => $name,
-        'email' => $email,
-        'password' => $password,
-        'address' => $address,
-        'contact' => $contact,
-        'gender' => $gender,
-        'role' => $role,
-
+    $rules = [
+        'name' => 'required|max:6',
+        'email' => 'email|required',
+        'password' => 'required|max:20|min:6'
     ];
-    $columns = ['name', 'email', 'password', 'address', 'contact', 'gender', 'role_id'];
-    $values = [':name', ':email', ':password', ':address', ':contact', ':gender', ':role'];
-    $final = $school->insert($columns, $values, $data);
-    if ($final) {
-        header('location: login');
-        exit;
+
+    $validation->validate($rules);
+    if ($validation->errors) {
+        $error = $validation->errors;
+    } else {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $address = $_POST['address'];
+        $contact = $_POST['contact'];
+        $gender = $_POST['gender'];
+        $role = $_POST['role'];
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'address' => $address,
+            'contact' => $contact,
+            'gender' => $gender,
+            'role' => $role,
+
+        ];
+        $columns = ['name', 'email', 'password', 'address',
+            'contact', 'gender', 'role_id'];
+        $values = [':name', ':email', ':password', ':address',
+            ':contact', ':gender', ':role'];
+        $final = $school->insert($columns, $values, $data);
+        if ($final) {
+            header('location: login');
+            exit;
+        }
     }
 
 }
@@ -85,19 +86,31 @@ if (isset($_POST['submitForm'])) {
                                     <label class="card-title">Name</label>
                                     <input type="text" class="form-control" name="name"
                                            placeholder="Enter Name" required>
-                                    <?php if (isset($output_name)) echo $output_name; ?>
+                                    <?php
+                                    if(!empty($error['name'])) {
+                                        $validation->print_errors($error['name']);
+                                    }
+                                    ?>
                                 </div>
                                 <div class="form-group">
                                     <label class="card-title">Email</label>
                                     <input type="text" class="form-control" name="email"
                                            placeholder="test@test.com" required>
-                                    <?php if (isset($output_email)) echo $output_email; ?>
+                                    <?php
+                                        if(!empty($error['email'])) {
+                                            $validation->print_errors($error['email']);
+                                        }
+                                    ?>
                                 </div>
                                 <div class="form-group">
                                     <label class="card-title">Password</label>
                                     <input type="password" class="form-control" name="password"
                                            placeholder="******" required>
-                                    <?php if (isset($output_password)) echo $output_password; ?>
+                                    <?php
+                                        if(!empty($error['password'])) {
+                                            $validation->print_errors($error['password']);
+                                        }
+                                    ?>
                                 </div>
                                 <div class="form-group">
                                     <label class="card-title">Address</label>
@@ -107,8 +120,8 @@ if (isset($_POST['submitForm'])) {
                                 <div class="form-group">
                                     <label class="card-title">Contact</label>
                                     <input type="number" class="form-control" name="contact"
-                                           placeholder="123456789">
-                                    <?php if (isset($output_contact)) echo $output_contact; ?>
+                                           placeholder="123...">
+
                                 </div>
                                 <label class="card-title">Gender</label>
                                 <div class="form-group">
@@ -123,7 +136,7 @@ if (isset($_POST['submitForm'])) {
                                     <select class="form-control form-control-lg" name="role" required>
                                         <option disabled selected>--Select Role--</option>
                                         <?php
-                                        $role = new School('role');
+                                        $role = new Database('role');
                                         $result = $role->show(false, '');
                                         foreach ($result as $row) {
                                             ?>
@@ -140,15 +153,15 @@ if (isset($_POST['submitForm'])) {
                                 </button>
                             </form>
                             <p class="mt-5 login-form__footer">Have account <a href="login"
-                                  class="text-primary">Sign In </a> now</p>
+                                                                               class="text-primary">Sign In </a> now</p>
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-     </div>
-  </div>
+    </div>
+</div>
 </div>
 <!--**********************************
     Scripts

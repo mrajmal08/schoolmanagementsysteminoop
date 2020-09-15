@@ -1,7 +1,5 @@
 <?php
-$sc = new School('user');
-$head =  $sc->table;
-
+$sc = new Database('user');
 $user_id = $_SESSION['sess_user_id'];
 $where = 'id =' . $user_id;
 

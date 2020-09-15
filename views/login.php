@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('user');
+$school = new Database('user');
 /**
  * login function call
  */

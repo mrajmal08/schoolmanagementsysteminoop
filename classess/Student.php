@@ -1,13 +1,12 @@
 <?php
 
 namespace MyStudent;
-require_once "../autoload/autoload.php";
 
-class Student extends \School
+class Student extends \Database
 {
+
     /**
      * this function used for assigning the class or subject to the user
-     * @param $conn
      * @param $user_id
      * @param null $class_id
      * @param null $subject_id
@@ -61,9 +60,7 @@ class Student extends \School
         } else {
             return "<span style='color: red'>Missing class_id || subject_id || user_id </span>";
         }
-        return true;
     }
-
 }
 
 //$student = new Student();

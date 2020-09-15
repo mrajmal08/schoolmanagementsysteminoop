@@ -1,11 +1,12 @@
 <?php
 session_start();
 require_once "../autoload/autoload.php";
-$school = new School('user');
+$school = new Database('user');
 use MyStudent\Student as Students;
 
 $student = new Students('user_has_subject');
-$subject = new Subject();
+use MySubject\Subject as Subjects;
+$subject = new Subjects();
 
 
 if (isset($_GET['type']) && $_GET['type'] == 'un_assign') {
@@ -61,7 +62,7 @@ if (isset($_POST['user_id'])) {
                                                 required>
                                             <option disabled selected>--Select Subject--</option>
                                             <?php
-                                            $sub = new School('subject');
+                                            $sub = new Database('subject');
                                             $result = $sub->show(false, '');
                                             foreach ($result as $row) {
                                                 ?>
