@@ -15,23 +15,20 @@ class Validation
 
         foreach ($rules as $field_name => $field_rules) {
             $rules_array = explode('|', $field_rules);
-
             foreach ($rules_array as $rule) {
-                if (strpos($rule, ':')) {
-                    $current_rule = explode(':', $rule);
-                    $parameter = [$current_rule[1], $field_name, $data[$field_name]];
+                $current_rule = explode(':', $rule);
+
+                /** @var if $current_rule doesn't got any value */
+                if (!isset($current_rule[1])) {
+                    $current_rule[1] = true;
+                }
+                if (!empty($current_rule[1])) {
+                    $param = [$current_rule[1], $field_name, $data[$field_name]];
                     if (method_exists($this, $current_rule[0])) {
                         $func = $current_rule[0];
-                        $this->$func(...$parameter);
+                        $this->$func(...$param);
                     } else {
-                        throw new Exception('Method does not exit');
-                    }
-                } else {
-                    $param = [$field_name, $data[$field_name]];
-                    if (method_exists($this, $rule)) {
-                        $this->$rule(...$param);
-                    } else {
-                        throw new Exception('Method does not exit');
+                        throw new Exception('Method now found');
                     }
                 }
             }
@@ -43,10 +40,16 @@ class Validation
      * @param $key
      * @return array|bool
      */
-    public function required($data)
+    public function required($data, $value, $field)
     {
-        $this->errors[$data][] = " $data is required";
-        return empty($data) ? false : true;
+//        if($field){
+//            return true;
+//        }
+//        else{
+//            $this->errors[$value][] = " $value is required";
+//        }
+        $this->errors[$value][] = " $value is required";
+        return empty($field) ? false : true;
     }
 
     /**
@@ -54,11 +57,16 @@ class Validation
      * @param $data
      * @return bool
      */
-    protected function email($data)
+    protected function email($data, $value, $field)
     {
-        $this->errors[$data][] = "Enter a valid email";
-        return empty(filter_var($data[0], FILTER_VALIDATE_EMAIL)) ? false : true;
+//        if (filter_var($field, FILTER_VALIDATE_EMAIL)) {
+//            return true;
+//        } else {
+//            $this->errors[$value][] = "Enter a valid email";
+//        }
 
+        $this->errors[$value][] = "Enter a valid email";
+        return empty(filter_var($field, FILTER_VALIDATE_EMAIL)) ? false : true;
     }
 
     /**
@@ -70,6 +78,11 @@ class Validation
      */
     protected function max($length, $field_name, $data)
     {
+//        if (strlen($data) <= $length) {
+//            return true;
+//        } else {
+//            $this->errors[$field_name][] = "maximum {$length} char";
+//        }
         $this->errors[$field_name][] = "maximum {$length} char";
         return empty(strlen($data) <= $length) ? false : true;
     }
@@ -83,8 +96,13 @@ class Validation
      */
     protected function min($length, $field_name, $data)
     {
+//        if (strlen($data) >= $length) {
+//            return true;
+//        } else {
+//            $this->errors[$field_name][] = "minimum {$length} char";
+//        }
         $this->errors[$field_name][] = "minimum {$length} char";
-        return empty((strlen($data) >= $length)) ? false : true;
+        return empty(strlen($data) >= $length) ? false : true;
     }
 
     /**

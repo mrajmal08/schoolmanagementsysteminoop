@@ -60,6 +60,8 @@ elseif (isset($_POST['submitTeacher'])) {
     $validation->validate($data, $rules);
     if ($validation->errors) {
         $error = $validation->errors;
+//        var_dump($error); exit;
+
     } else {
         $name = $_POST['name'];
         $email = $_POST['email'];
