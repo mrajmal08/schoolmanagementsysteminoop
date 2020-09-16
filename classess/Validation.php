@@ -2,40 +2,37 @@
 
 namespace MyValidation;
 
+use Exception;
+
 class Validation
 {
     public $data;
     public $errors = [];
 
-    /**
-     * validation dynamic function
-     * @param $rules
-     */
-    public function validate($rules)
+    public function validate($data, $rules)
     {
-        $this->data = $_POST;
+        $this->data = $data;
 
-        foreach ($rules as $key => $values) {
-            //explode items for differentiate |
-            $require = explode('|', $values);
-            foreach ($require as $item) {
+        foreach ($rules as $field_name => $field_rules) {
+            $rules_array = explode('|', $field_rules);
 
-                if ($item == 'require') {
-                    $this->is_required($key);
-
-                } elseif ($item == 'email') {
-                    $this->is_required($key);
-                    $this->is_email($key);
-
-                } elseif (strpos($item, 'max') !== false) {
-                    $max_value = explode(':', $item);
-                    $this->is_required($key);
-                    $this->is_max($max_value[1], $key);
-
-                } elseif (strpos($item, 'min') !== false) {
-                    $min_value = explode(':', $item);
-                    $this->is_required($key);
-                    $this->is_min($min_value[1], $key);
+            foreach ($rules_array as $rule) {
+                if (strpos($rule, ':')) {
+                    $current_rule = explode(':', $rule);
+                    $parameter = [$current_rule[1], $field_name, $data[$field_name]];
+                    if (method_exists($this, $current_rule[0])) {
+                        $func = $current_rule[0];
+                        $this->$func(...$parameter);
+                    } else {
+                        throw new Exception('Method does not exit');
+                    }
+                } else {
+                    $param = [$field_name, $data[$field_name]];
+                    if (method_exists($this, $rule)) {
+                        $this->$rule(...$param);
+                    } else {
+                        throw new Exception('Method does not exit');
+                    }
                 }
             }
         }
@@ -46,60 +43,54 @@ class Validation
      * @param $key
      * @return array|bool
      */
-    public function is_required($key)
+    public function required($data)
     {
-        if (array_key_exists($key, $this->data)) {
-            return true;
-        } else {
-            return $this->errors[$key][] = "This is required field";
-        }
+        $this->errors[$data][] = " $data is required";
+        return empty($data) ? false : true;
     }
 
     /**
-     * email validation function
-     * @param $key
+     * email validation
+     * @param $data
      * @return bool
      */
-    public function is_email($key)
+    protected function email($data)
     {
-        if (filter_var($this->data[$key], FILTER_VALIDATE_EMAIL)) {
-            return true;
-        } else {
-            $this->errors[$key][] = "Enter a valid email";
+        $this->errors[$data][] = "Enter a valid email";
+        return empty(filter_var($data[0], FILTER_VALIDATE_EMAIL)) ? false : true;
 
-        }
     }
 
     /**
-     * validation for maximum values
+     * max validation checck function
      * @param $length
-     * @param $key
+     * @param $field_name
+     * @param $data
      * @return bool
      */
-    public function is_max($length, $key)
+    protected function max($length, $field_name, $data)
     {
-        if (strlen($this->data[$key]) <= $length) {
-            return true;
-        } else {
-            $this->errors[$key][] = "Max length should be $length";
-        }
+        $this->errors[$field_name][] = "maximum {$length} char";
+        return empty(strlen($data) <= $length) ? false : true;
     }
 
     /**
-     * validation for minimum values
+     * min validation check function
      * @param $length
-     * @param $key
+     * @param $field_name
+     * @param $data
      * @return bool
      */
-    public function is_min($length, $key)
+    protected function min($length, $field_name, $data)
     {
-        if (strlen($this->data[$key]) >= $length) {
-            return true;
-        } else {
-            $this->errors[$key][] = "Min length should be $length ";
-        }
+        $this->errors[$field_name][] = "minimum {$length} char";
+        return empty((strlen($data) >= $length)) ? false : true;
     }
 
+    /**
+     * validation errors function
+     * @param $item
+     */
     public function print_errors($item)
     {
         foreach ($item as $value) {

@@ -56,7 +56,8 @@ elseif (isset($_POST['submitTeacher'])) {
         'password' => 'required|max:20|min:6'
     ];
 
-    $validation->validate($rules);
+    $data = $_POST;
+    $validation->validate($data, $rules);
     if ($validation->errors) {
         $error = $validation->errors;
     } else {
